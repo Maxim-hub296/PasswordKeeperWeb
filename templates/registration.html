@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="static/styles/registration.css">
+    <script  src="static/scripts/flash_alerts.js"></script>
+</head>
+<body>
+    <h2>Регистрация!</h2>
+
+     {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div id="flash-message" style="display:none;">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h4>Мы всегда рады новым пользователям!</h4>
+    <div class="register">
+
+    <form method="post" action="{{ url_for('registration') }}">
+        <p>Как вас зовут?</p>
+        <input type="text" placeholder="Имя" name="name" required>
+        <p>Ваш пароль будет нашим маленьким секретом :)</p>
+        <input type="password" placeholder="Пароль" name="password" required><br><br>
+        <button type="submit">Зарегистрироваться!</button>
+    </form>
+    </div>
+    <form method="post">
+        <button type="submit" name="login">Авторизация</button>
+    </form>
+
+
+</body>
+</html>

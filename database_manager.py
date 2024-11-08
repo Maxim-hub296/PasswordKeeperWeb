@@ -7,7 +7,7 @@ from crypto import Crypto
 class DataBaseManager:
     def __init__(self) -> None:
         """Инициализируем все, что нужно и создаём/проверяем таблицы"""
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect("users.db")
         self.cursor = self.conn.cursor()
 
         self.cursor.execute(create_users_passwords_table)
@@ -19,8 +19,19 @@ class DataBaseManager:
         if not self.user_exists(user):
             try:
 
-                self.cursor.execute(insert_user_and_password, (user, sha256(password.encode()).hexdigest()))
-                self.cursor.execute(insert_user, (user,))
+                api_key = sha256(user.encode()).hexdigest()
+
+                self.cursor.execute(
+                    insert_user_and_password,
+                    (user, sha256(password.encode()).hexdigest()),
+                )
+                self.cursor.execute(
+                    insert_user,
+                    (
+                        user,
+                        api_key,
+                    ),
+                )
                 self.conn.commit()
                 return True
 
@@ -33,27 +44,17 @@ class DataBaseManager:
     def user_exists(self, user: str) -> bool:
         """Проверяет существование пользователь"""
         self.cursor.execute(get_users)
-        users = []
-        for i in self.cursor.fetchall():
-            users.append(*i)
-
-        if user in users:
-            return True
-        else:
-            return False
+        users = [row[0] for row in self.cursor.fetchall()]
+        return user in users
 
     def login(self, user: str, password: str) -> list[bool | str]:
         """Авторизация пользователя или возвращение ошибки"""
         if self.user_exists(user):
             self.cursor.execute(get_password_by_name, (user,))
             result = self.cursor.fetchone()
-            if sha256(password.encode()).hexdigest() == result[0]:
-                print(result)
-
+            if result and sha256(password.encode()).hexdigest() == result[0]:
                 return [True]
             else:
-                print(result)
-
                 return [False, "Неверный пароль"]
         else:
             return [False, "Неверное имя пользователя"]
@@ -76,10 +77,34 @@ class DataBaseManager:
         user_password = self.get_password_by_name(user)
         passwords = []
         for row in rows:
-            password_line = f'{row[0]} - {Crypto.decrypt(row[1], user_password)}'
+            password_line = f"{row[0]} - {Crypto.decrypt(row[1], user_password)}"
             passwords.append(password_line)
         return passwords
 
 
-a = DataBaseManager()
-print(a.login('test3', 'qwerty2'))
+class ApiDatabaseManager:
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect("users.db")
+        self.cursor = self.conn.cursor()
+
+    def get_password_by_name(self, user_name: str) -> str:
+        """Получить пароль по имени пользователя"""
+        self.cursor.execute(get_password_by_name, (user_name,))
+        password = self.cursor.fetchone()
+        return password[0]
+
+    def get_user_passwords_api(self, api_key: str) -> dict[str, str]:
+        """Получить все пароли пользователя через API-ключ"""
+        self.cursor.execute(get_username_api, (api_key,))
+        user_name = self.cursor.fetchone()
+        if user_name:
+            user_name = user_name[0]
+            self.cursor.execute(get_user_passwords, (user_name,))
+            rows = self.cursor.fetchall()
+            user_password = self.get_password_by_name(user_name)
+            passwords = {}
+            for row in rows:
+                passwords[row[0]] = Crypto.decrypt(row[1], user_password)
+            return passwords
+        else:
+            return {"error": "Invalid API key or user not found"}

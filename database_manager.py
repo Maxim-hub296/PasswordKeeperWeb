@@ -7,7 +7,7 @@ from crypto import Crypto
 class DataBaseManager:
     def __init__(self) -> None:
         """Инициализируем все, что нужно и создаём/проверяем таблицы"""
-        self.conn = sqlite3.connect('users.db')
+        self.conn = sqlite3.connect("users.db")
         self.cursor = self.conn.cursor()
 
         self.cursor.execute(create_users_passwords_table)
@@ -19,7 +19,10 @@ class DataBaseManager:
         if not self.user_exists(user):
             try:
 
-                self.cursor.execute(insert_user_and_password, (user, sha256(password.encode()).hexdigest()))
+                self.cursor.execute(
+                    insert_user_and_password,
+                    (user, sha256(password.encode()).hexdigest()),
+                )
                 self.cursor.execute(insert_user, (user,))
                 self.conn.commit()
                 return True
@@ -76,10 +79,10 @@ class DataBaseManager:
         user_password = self.get_password_by_name(user)
         passwords = []
         for row in rows:
-            password_line = f'{row[0]} - {Crypto.decrypt(row[1], user_password)}'
+            password_line = f"{row[0]} - {Crypto.decrypt(row[1], user_password)}"
             passwords.append(password_line)
         return passwords
 
 
 a = DataBaseManager()
-print(a.login('test3', 'qwerty2'))
+print(a.login("test3", "qwerty2"))

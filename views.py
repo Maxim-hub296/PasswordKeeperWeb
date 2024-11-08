@@ -156,3 +156,17 @@ class YourPasswordView(MethodView):
             return redirect('/password_generator')
         if 'input' in request.form.to_dict().keys():
             return redirect('/your_password_input')
+
+
+class ApiView(MethodView):
+    """Класс представления API"""
+    def get(self):
+        db = DataBaseManager()
+        if "username" in session:
+            api_key = db.get_api_key(session['username'])
+            if api_key:
+                return render_template('API.html', api_key=api_key)
+            else:
+                return render_template("API.html", message="У вас нет ключа API! Напишите об этом в техническую поддержку.")
+        else:
+            return redirect("/login")

@@ -19,11 +19,19 @@ class DataBaseManager:
         if not self.user_exists(user):
             try:
 
+                api_key = sha256(user.encode()).hexdigest()
+
                 self.cursor.execute(
                     insert_user_and_password,
                     (user, sha256(password.encode()).hexdigest()),
                 )
-                self.cursor.execute(insert_user, (user,))
+                self.cursor.execute(
+                    insert_user,
+                    (
+                        user,
+                        api_key,
+                    ),
+                )
                 self.conn.commit()
                 return True
 
@@ -36,27 +44,17 @@ class DataBaseManager:
     def user_exists(self, user: str) -> bool:
         """Проверяет существование пользователь"""
         self.cursor.execute(get_users)
-        users = []
-        for i in self.cursor.fetchall():
-            users.append(*i)
-
-        if user in users:
-            return True
-        else:
-            return False
+        users = [row[0] for row in self.cursor.fetchall()]
+        return user in users
 
     def login(self, user: str, password: str) -> list[bool | str]:
         """Авторизация пользователя или возвращение ошибки"""
         if self.user_exists(user):
             self.cursor.execute(get_password_by_name, (user,))
             result = self.cursor.fetchone()
-            if sha256(password.encode()).hexdigest() == result[0]:
-                print(result)
-
+            if result and sha256(password.encode()).hexdigest() == result[0]:
                 return [True]
             else:
-                print(result)
-
                 return [False, "Неверный пароль"]
         else:
             return [False, "Неверное имя пользователя"]
@@ -83,6 +81,47 @@ class DataBaseManager:
             passwords.append(password_line)
         return passwords
 
+    def get_api_key(self, user: str) -> str:
+        """Получить API-ключ по имени пользователя"""
+        self.cursor.execute(get_user_api_key, (user,))
+        api_key = self.cursor.fetchone()
+        return api_key[0] if api_key else None
 
-a = DataBaseManager()
-print(a.login("test3", "qwerty2"))
+
+class ApiDatabaseManager:
+    def __init__(self) -> None:
+        self.conn = sqlite3.connect("users.db")
+        self.cursor = self.conn.cursor()
+
+    def get_user_by_api_key(self, api_key: str) -> str:
+        """Получить имя пользователя по API-ключу"""
+        self.cursor.execute(get_username_api, (api_key,))
+        user_name = self.cursor.fetchone()
+        return user_name[0] if user_name else None
+
+    def get_password_by_name(self, user_name: str) -> str:
+        """Получить пароль по имени пользователя"""
+        self.cursor.execute(get_password_by_name, (user_name,))
+        password = self.cursor.fetchone()
+        return password[0]
+
+    def save_password(self, user: str, site_name: str, password: str) -> None:
+        """Сохраняет пароль дял сайта в базу данных"""
+        self.cursor.execute(insert_site_passwords, (user, site_name, password))
+        self.conn.commit()
+
+    def get_user_passwords_api(self, api_key: str) -> dict[str, str]:
+        """Получить все пароли пользователя через API-ключ"""
+        self.cursor.execute(get_username_api, (api_key,))
+        user_name = self.cursor.fetchone()
+        if user_name:
+            user_name = user_name[0]
+            self.cursor.execute(get_user_passwords, (user_name,))
+            rows = self.cursor.fetchall()
+            user_password = self.get_password_by_name(user_name)
+            passwords = {}
+            for row in rows:
+                passwords[row[0]] = Crypto.decrypt(row[1], user_password)
+            return passwords
+        else:
+            return {"error": "Invalid API key or user not found"}

@@ -9,7 +9,8 @@ create_users_passwords_table = """
 # Команда для создания таблицы users
 create_users_table = """
 CREATE TABLE IF NOT EXISTS users (
-    username TEXT PRIMARY KEY
+    username TEXT PRIMARY KEY,
+    api_key TEXT NOT NULL UNIQUE
 )
 """
 
@@ -28,7 +29,7 @@ insert_user_and_password = "INSERT INTO user_passwords (username, password) VALU
 
 # Команда для вставки пользователя в таблицу users
 insert_user = """
-INSERT INTO users (username) VALUES (?)
+INSERT INTO users (username, api_key) VALUES (?, ?)
 """
 
 # Команда для вставки паролей для сайтов в таблицу site_passwords
@@ -46,3 +47,11 @@ exists_user = (
 get_user_passwords = "SELECT site, password FROM site_passwords WHERE username = ?"
 
 get_users = "SELECT * FROM users"
+
+### API SQL ###
+
+get_username_api = "SELECT username FROM users WHERE api_key = ?"
+
+get_user_api_key = (
+    "SELECT api_key FROM users WHERE username = ?"  # Не забывай передавать имя!
+)

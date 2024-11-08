@@ -6,6 +6,7 @@ from views import (
     LoginView,
     GeneratePassword,
     YourPasswordInputView,
+    ApiView,
 )
 from secrets import token_hex
 from datetime import timedelta
@@ -28,5 +29,6 @@ app.add_url_rule(
     "/your_password_input",
     view_func=YourPasswordInputView.as_view("your_password_input"),
 )
+app.add_url_rule("/api", view_func=ApiView.as_view("api"))
 
 app.run(debug=True)

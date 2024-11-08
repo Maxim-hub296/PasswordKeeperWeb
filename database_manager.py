@@ -87,11 +87,22 @@ class ApiDatabaseManager:
         self.conn = sqlite3.connect("users.db")
         self.cursor = self.conn.cursor()
 
+    def get_user_by_api_key(self, api_key: str) -> str:
+        """Получить имя пользователя по API-ключу"""
+        self.cursor.execute(get_username_api, (api_key,))
+        user_name = self.cursor.fetchone()
+        return user_name[0] if user_name else None
+
     def get_password_by_name(self, user_name: str) -> str:
         """Получить пароль по имени пользователя"""
         self.cursor.execute(get_password_by_name, (user_name,))
         password = self.cursor.fetchone()
         return password[0]
+
+    def save_password(self, user: str, site_name: str, password: str) -> None:
+        """Сохраняет пароль дял сайта в базу данных"""
+        self.cursor.execute(insert_site_passwords, (user, site_name, password))
+        self.conn.commit()
 
     def get_user_passwords_api(self, api_key: str) -> dict[str, str]:
         """Получить все пароли пользователя через API-ключ"""

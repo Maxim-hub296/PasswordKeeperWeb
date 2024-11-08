@@ -2,12 +2,13 @@ from cryptography.fernet import Fernet
 import base64
 import hashlib
 
+
 class Crypto:
 
     @staticmethod
     def generate_cipher_suite(user_password):
         # Преобразование пароля в байты
-        password_bytes = user_password.encode('utf-8')
+        password_bytes = user_password.encode("utf-8")
 
         # Хеширование пароля для получения 32 байт ключа
         key = hashlib.sha256(password_bytes).digest()
@@ -35,10 +36,8 @@ class Crypto:
 
     @staticmethod
     def bytes_to_utf8(byte_string):
-        return byte_string.decode('utf-8')
+        return byte_string.decode("utf-8")
 
     @staticmethod
     def utf8_to_bytes(utf8_string):
-        return utf8_string.encode('utf-8')
-
-
+        return utf8_string.encode("utf-8")

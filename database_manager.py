@@ -81,6 +81,12 @@ class DataBaseManager:
             passwords.append(password_line)
         return passwords
 
+    def get_api_key(self, user: str) -> str:
+        """Получить API-ключ по имени пользователя"""
+        self.cursor.execute(get_user_api_key, (user,))
+        api_key = self.cursor.fetchone()
+        return api_key[0] if api_key else None
+
 
 class ApiDatabaseManager:
     def __init__(self) -> None:

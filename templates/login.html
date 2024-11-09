@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Авторизация</title>
-    <link rel="stylesheet" href="static/styles/login.css">
-</head>
-<body>
-<h2>Авторизация!</h2>
-<h4>Рады снова вас видеть!</h4><br>
-<h4>Введите ваше имя и пароль</h4>
-<div class="login">
-<form method="post">
-    <input type="text" placeholder="Имя" name="name" required><br><br>
-    <input type="password" placeholder="Пароль" name="password" required><br><br>
-    <button type="submit" name="enter" value="enter">Авторизоваться</button>
-</form>
-</div>
-
-<form method="post">
-    <button type="submit" name="register" value="register">Зарегистрироваться</button>
-</form>
-
-
-
-
-{% if message %}
-    <h4>{{ message }}</h4>
-{% endif %}
-
-
-</body>
+    <link rel="stylesheet" href="static/styles/login.css" />
+  </head>
+  <body>
+    <div class="login-form">
+      <h2>Авторизация!</h2>
+      <h4>Рады снова вас видеть!</h4>
+      {% if message %}
+      <h4 class="error-message">{{ message }}</h4>
+      {% endif %}
+      <form method="post">
+        <input type="text" placeholder="Имя" name="name" required /><br />
+        <input
+          type="password"
+          placeholder="Пароль"
+          name="password"
+          required
+        /><br />
+        <button type="submit" name="enter" value="enter">Авторизоваться</button>
+      </form>
+      <div class="register-button">
+        <form method="post">
+          <button type="submit" name="register" value="register">
+            Зарегистрироваться
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
 </html>

@@ -1,5 +1,7 @@
-from peewee import MySQLDatabase, Model, CharField, PrimaryKeyField, ForeignKeyField
-from crypto import Crypto
+# ORM модели
+from peewee import MySQLDatabase, Model, CharField, PrimaryKeyField, \
+    ForeignKeyField  # Импорты полей и класса подключения к MySQL серверу
+from crypto import Crypto  # Используется для __str__ метода в Passwords
 
 # Параметры подключения
 db = MySQLDatabase(
@@ -13,48 +15,35 @@ db = MySQLDatabase(
 
 # Определите модель
 class BaseModel(Model):
+    """Базовая модель"""
+
     class Meta:
         database = db
 
 
 class Users(BaseModel):
-    id = PrimaryKeyField()
-    name = CharField(unique=True)
-    hash_password = CharField()
-
-    def __str__(self):
-        return f'{self.name}'
+    """Модель таблицы с пользователями"""
+    id = PrimaryKeyField()  # Поле id
+    name = CharField(unique=True)  # Поле имя (имя уникальное)
+    hash_password = CharField()  # Хэшированный пароль
 
 
 class Passwords(BaseModel):
-    id = PrimaryKeyField()
-    user = ForeignKeyField(Users, backref='passwords', on_delete='CASCADE')
-    name_site = CharField()
-    login = CharField()
-    password = CharField()
+    """Модель таблицы с паролями"""
+    id = PrimaryKeyField()  # Поле id
+    user = ForeignKeyField(Users, backref='passwords',
+                           on_delete='CASCADE')  # Поле пользователь из таблицы Users (при удаленье, пользователя удаляться и его пароли)
+    name_site = CharField()  # Название сайта
+    login = CharField()  # Логин к сайту
+    password = CharField()  # Пароль к сайту
 
     def __str__(self):
+        """Выводит данные о пароли (используется в передачи объекта в jinja)"""
         return f"{self.name_site}: Логин - {self.login}, Пароль - {Crypto.decrypt(self.password, self.user.hash_password)}"
 
 
-# db.create_tables([Users, Passwords])
-
-
 def create_tables():
+    """Создаём таблицы по моделям"""
     db.create_tables([Users, Passwords])
 
 # db.drop_tables([Users, Passwords])  #!!!Убрать комментарий только если нужна пустая БД
-
-# #
-# for i in Users.select():
-#     print(i)
-#
-
-
-
-
-# Passwords.get_or_create(user=Users.get_or_none(name="user1"),
-#                         name_site="Google",
-#                         login="log",
-#                         password="qw34")
-

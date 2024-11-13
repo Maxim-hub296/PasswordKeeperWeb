@@ -1,3 +1,4 @@
+<!--Шаблон страницы авторизации -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,41 +8,46 @@
     <!-- Подключение Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh; background: linear-gradient(135deg, #e6ffed, #f0f8ff);">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8 col-sm-10">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body text-center">
-                        <h2 class="card-title mb-4">Авторизация!</h2>
-                        <h4 class="mb-4">Рады снова вас видеть! Введите ваше имя и пароль</h4>
+<body class="d-flex align-items-center justify-content-center"
+      style="min-height: 100vh; background: linear-gradient(135deg, #e6ffed, #f0f8ff);">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">Авторизация!</h2>
+                    <h4 class="mb-4">Рады снова вас видеть! Введите ваше имя и пароль</h4>
 
-                        <div class="login">
-                            <form method="post">
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" placeholder="Имя" name="name" required>
-                                </div>
-                                <div class="mb-4">
-                                    <input type="password" class="form-control" placeholder="Пароль" name="password" required>
-                                </div>
-                                <button type="submit" name="enter" value="enter" class="btn btn-primary w-100">Авторизоваться</button>
-                            </form>
-                        </div>
-
-                        <form method="post" action="/registration" class="mt-3">
-                            <button type="submit" name="register" value="register" class="btn btn-link">Зарегистрироваться</button>
+                    <div class="login">
+                        <form method="post">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" placeholder="Имя" name="name" required>
+                            </div>
+                            <div class="mb-4">
+                                <input type="password" class="form-control" placeholder="Пароль" name="password"
+                                       required>
+                            </div>
+                            <button type="submit" name="enter" value="enter" class="btn btn-primary w-100">
+                                Авторизоваться
+                            </button>
                         </form>
-
-                        {% if message %}
-                            <div class="alert alert-warning mt-4">{{ message }}</div>
-                        {% endif %}
                     </div>
+
+                    <form method="post" action="/registration" class="mt-3">
+                        <button type="submit" name="register" value="register" class="btn btn-link">Зарегистрироваться
+                        </button>
+                    </form>
+
+                    {% if message %}
+                    <div class="alert alert-warning mt-4">{{ message }}</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Подключение Bootstrap 5 JS и зависимости -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Подключение Bootstrap 5 JS и зависимости -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

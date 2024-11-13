@@ -1,9 +1,13 @@
-from string import ascii_lowercase, ascii_uppercase, digits, punctuation
-from random import choice, choices, shuffle
+# Некоторые функции
+
+from string import ascii_lowercase, ascii_uppercase, digits, punctuation  # Импортируем коллекции символов
+from random import choice, choices, shuffle  # Импортируем случайный выбор/выборы и перемешивание
 
 
 def generate_password(length: int, choose: list) -> str:
-    length = int(length)
+    """Генерирует пароль на основе длинны и выбора символов"""
+    length = int(length)  # Делаем длину int
+    # Алгоритм генерации пароля, чтобы хотя бы один символ из каждой выбранной коллекции попал в пароль
     symbols = ''
     password = []
     kirill_up = ''.join(chr(i) for i in range(ord('А'), ord('Я') + 1))
@@ -24,9 +28,4 @@ def generate_password(length: int, choose: list) -> str:
     password.extend(choices(symbols, k=length - len(password)))
     shuffle(password)
     res_password = ''.join(password)
-    return res_password
-
-
-
-
-
+    return res_password  # Возвращаем сам пароль

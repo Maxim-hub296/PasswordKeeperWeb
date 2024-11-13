@@ -38,8 +38,7 @@ def save_your_password(user, site_name, login, password):
     Passwords.get_or_create(user=user,
                             name_site=site_name,
                             login=login,
-                            password=password)
-    print("Пароль сохранен")
+                            password=Crypto.encrypt(password, user.hash_password))
 
 def show_passwords(user_name):
     user = Users.get_or_none(name=user_name)

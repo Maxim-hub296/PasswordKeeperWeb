@@ -93,26 +93,35 @@ class GeneratePassword(MethodView):
 
 class YourPasswordInputView(MethodView):
     def get(self):
+        # Отображаем форму только если пользователь авторизован
         if "username" in session:
-            return render_template('your_password_input.html')
+            return render_template('your_password_input.html', saved=False)
         else:
             return redirect('/login')
 
     def post(self):
         data = request.form.to_dict()
-        if "create" in data:
-            if 'username' in session:
-                user_name = session['username']
-                user = Users.get_or_none(name=user_name)
+
+        # Проверка на наличие данных и авторизацию
+        if "create" in data and 'username' in session:
+            user_name = session['username']
+            user = Users.get_or_none(name=user_name)
+
+            # Если пользователь существует, сохраняем пароль
+            if user:
                 site_name = data['name']
                 password = data['password']
                 login = data['login']
                 save_your_password(user, site_name, login, password)
-                return render_template('your_password_input.html')
+
+                # Успешное сохранение, передаем `saved=True`
+                return render_template('your_password_input.html', saved=True)
             else:
+                # Если пользователь не найден, перенаправляем на страницу авторизации
                 return redirect('/login')
-        else:
-            return redirect('/your_passwords')
+
+        # Перенаправление на `/your_passwords` для всех прочих POST-запросов
+        return redirect('/your_passwords')
 
 
 class YourPasswordView(MethodView):
@@ -131,7 +140,15 @@ class YourPasswordView(MethodView):
             return redirect('/login')
 
     def post(self):
-        if 'create' in request.form.to_dict().keys():
+        """Метод обрабатывающий POST-запрос. Перенаправляет на соответствующую страницу."""
+
+        # Проверяем наличие ключей в форме и перенаправляем на нужные маршруты
+        form_data = request.form.to_dict()
+        if 'create' in form_data:
             return redirect('/password_generator')
-        if 'input' in request.form.to_dict().keys():
+        elif 'input' in form_data:
             return redirect('/your_password_input')
+
+        # Если ни один ключ не найден, перенаправляем обратно на страницу паролей
+        return redirect('/your_passwords')
+

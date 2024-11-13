@@ -37,7 +37,7 @@ class Passwords(BaseModel):
         return f"{self.name_site}: Логин - {self.login}, Пароль - {Crypto.decrypt(self.password, self.user.hash_password)}"
 
 
-db.create_tables([Users, Passwords])
+# db.create_tables([Users, Passwords])
 
 
 def create_tables():

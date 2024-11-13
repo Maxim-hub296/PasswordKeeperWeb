@@ -1,8 +1,6 @@
 from flask import render_template, request, redirect, session, flash
 from flask.views import MethodView
-from database_manager import DataBaseManager
-from func import generate_password
-from crypto import Crypto
+from controls import *
 
 
 class AboutView(MethodView):
@@ -11,16 +9,6 @@ class AboutView(MethodView):
     def get(self):
         """Метод обрабатывающий GET-запрос. Возвращает шаблон страницы about.html"""
         return render_template('about.html')
-
-    def post(self):
-        """Метод обрабатывающий POST-запрос. Направляет на страницы с регистрацией или авторизации.
-        Использует шаблоны registration.html и login.html соответственно"""
-        if 'register' in request.form.to_dict().keys():  # Проверка, какая кнопка была нажата
-            # Если нажата кнопка "Зарегистрироваться"
-            return redirect('/registration')
-        else:
-            # Если нажата кнопка "Авторизоваться"
-            return redirect('/login')
 
 
 class RegistrationView(MethodView):
@@ -33,15 +21,10 @@ class RegistrationView(MethodView):
     def post(self):
         """Метод обрабатывающий POST-запрос. Обращается к БД и заносит данные пользователь (имя и пароль)"""
         data = request.form.to_dict()
-        print(data)
+
         if 'login' not in data:
-            db = DataBaseManager()  # Инициализируем класс, тем самым обращаемся к БД
-            print(data)
-            if db.new_user(data['name'],
-                           data['password']):  # Вносим и сохраняем нового пользователя
 
-                session['username'] = data['name']
-
+            if registration(data['name'], data['password'], session):
                 return redirect('/your_passwords')  # Перенаправляем на страницу с паролями пользователя
             else:
                 flash('Такой пользователь уже есть')
@@ -62,9 +45,7 @@ class LoginView(MethodView):
         data = request.form.to_dict()
 
         if data.get('enter', None):
-            db = DataBaseManager()
-            res = db.login(data['name'], data['password'])
-            print(res)
+            res = login(data['name'], data['password'])
             if res[0]:
                 session['username'] = data['name']
                 return redirect('/your_passwords')
@@ -90,21 +71,20 @@ class GeneratePassword(MethodView):
         data = request.form.to_dict()
         if 'create' in data:
             del data['create']
-            db = DataBaseManager()
 
             if 'username' in session:
-                user_password = db.get_password_by_name(session['username'])
+                user: Users = Users.get_or_none(name=session['username'])
+                user_password = user.hash_password
                 data = request.form.to_dict()
                 site_name = data.pop('name')
+                login = data.pop('login')
                 length = int(data.pop('length'))
                 choose = [i for i in data if
                           i in ["kiril_low", "kiril_up", "latin_low", "latin_up", "digits", "special"]]
 
-                password = generate_password(length, choose)
+                save_generated_password(user, user_password, site_name, login, length, choose)
 
-                db.save_password(session['username'], site_name, Crypto.encrypt(password, user_password))
-
-                return render_template("password_generator.html")
+                return render_template("password_generator.html", flag=True)
             else:
                 return redirect('/login')
         if data.get('back', None) == 'back':
@@ -122,12 +102,12 @@ class YourPasswordInputView(MethodView):
         data = request.form.to_dict()
         if "create" in data:
             if 'username' in session:
-                db = DataBaseManager()
                 user_name = session['username']
-                user_password = db.get_password_by_name(user_name)
+                user = Users.get_or_none(name=user_name)
                 site_name = data['name']
                 password = data['password']
-                db.save_password(user_name, site_name, Crypto.encrypt(password, user_password))
+                login = data['login']
+                save_your_password(user, site_name, login, password)
                 return render_template('your_password_input.html')
             else:
                 return redirect('/login')
@@ -140,10 +120,9 @@ class YourPasswordView(MethodView):
 
     def get(self):
         """Метод обрабатывающий GET-запрос. Возвращает шаблон страницы your_passwords.html"""
-        db = DataBaseManager()
 
         if 'username' in session:
-            passwords = db.get_user_passwords(session['username'])
+            passwords = show_passwords(session['username'])
             if passwords:
                 return render_template('your_passwords.html', passwords=passwords)
             else:

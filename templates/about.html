@@ -2,19 +2,43 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>О нас</title>
-    <link rel="stylesheet" href="static/styles/about.css">
+    <!-- Подключение Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Используем встроенные классы Bootstrap 5, но фон создаём через inline CSS */
+        body {
+            background: linear-gradient(135deg, #e6ffed, #f0f8ff); /* Нежный градиент */
+            min-height: 100vh; /* Занимает всю высоту */
+        }
+    </style>
 </head>
-<body>
-    <h1>О нашем сервисе!</h1>
-    <p>Наш сервис создан, чтобы удобно и надежно хранить ваши пароли. И абсолютно бесплатно!
-    Мы используем алгоритм AES для шифрования ваших пароль. Это быстро, эффективно, гибко, долговечно!</p>
-    <div class="contact">Email: maxsavikin@gmail.com</div>
-    <form method="post">
-        <button type="submit" name="register" value="register">Зарегистрироваться</button>
-        <button type="submit" name="login" value="login">Авторизация</button>
+<body class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-10">
+                <div class="card bg-dark text-light shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h1 class="card-title">О нас</h1>
+                        <p class="card-text">
+                            Наш сервис создан, чтобы удобно и надежно хранить ваши пароли. И абсолютно бесплатно!
+                        </p>
+                        <p class="card-text">
+                            Мы используем алгоритм AES для шифрования ваших паролей. Это быстро, эффективно, гибко, долговечно!
+                        </p>
+                        <!-- Кнопки авторизации и регистрации -->
+                        <div class="mt-4">
+                            <a href="/login" class="btn btn-primary me-2">Авторизация</a>
+                            <a href="/registration" class="btn btn-success">Регистрация</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </form>
-
+    <!-- Подключение Bootstrap 5 JS и зависимости -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

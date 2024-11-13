@@ -2,6 +2,7 @@ from flask import Flask
 from views import AboutView, RegistrationView, YourPasswordView, LoginView, GeneratePassword, YourPasswordInputView
 from secrets import token_hex
 from datetime import timedelta
+from database import *
 
 app = Flask(__name__)
 
@@ -14,5 +15,7 @@ app.add_url_rule('/login', view_func=LoginView.as_view('login'))
 app.add_url_rule('/your_passwords', view_func=YourPasswordView.as_view('your_passwords'))
 app.add_url_rule('/password_generator', view_func=GeneratePassword.as_view('password_generator'))
 app.add_url_rule('/your_password_input', view_func=YourPasswordInputView.as_view('your_password_input'))
+
+create_tables()
 
 app.run(debug=True)
